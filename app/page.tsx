@@ -1,65 +1,112 @@
-import Image from "next/image";
+import { ProductCard } from "@/components/product/ProductCard";
+import { getProductsWithPrices, getTopDeals } from "@/lib/db-queries";
 
-export default function Home() {
+export const revalidate = 3600; // ISR: refresh data every hour
+
+export default async function Home() {
+  const [products, topDeals] = await Promise.all([
+    getProductsWithPrices(),
+    getTopDeals(),
+  ]);
+
+  const latestProducts = products.slice(0, 4);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    <main className="px-6 py-10 md:px-12 md:py-14 max-w-6xl mx-auto">
+      {/* Hero */}
+      <section className="mb-10 md:mb-14 text-center">
+        <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
+          Encuentra el mejor precio para tu próximo PC
+        </h1>
+        <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+          Compara tarjetas gráficas, procesadores y almacenamiento en las principales
+          tiendas online y toma decisiones de compra con datos en tiempo real.
+        </p>
+
+        {/* Search bar (UI placeholder) */}
+        <div className="w-full max-w-xl mx-auto">
+          <div className="flex items-center gap-2 rounded-full border bg-background px-4 py-2 shadow-sm">
+            <input
+              type="text"
+              placeholder="Buscar componente o producto (próximamente)"
+              className="flex-1 bg-transparent outline-none text-sm md:text-base"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <button
+              type="button"
+              className="text-xs md:text-sm font-medium px-3 py-1.5 rounded-full bg-primary text-primary-foreground opacity-70 cursor-default"
+            >
+              Buscar
+            </button>
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* Categories grid */}
+      <section className="mb-10 md:mb-12">
+        <h2 className="text-xl md:text-2xl font-semibold mb-4">Categorías populares</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+          <div className="rounded-xl border bg-card p-4 flex flex-col gap-2">
+            <div className="text-sm font-semibold">Tarjetas gráficas</div>
+            <p className="text-xs text-muted-foreground">
+              Encuentra la mejor GPU para gaming y creación de contenido.
+            </p>
+          </div>
+          <div className="rounded-xl border bg-card p-4 flex flex-col gap-2">
+            <div className="text-sm font-semibold">Procesadores</div>
+            <p className="text-xs text-muted-foreground">
+              Compara CPUs de última generación para tu próximo PC.
+            </p>
+          </div>
+          <div className="rounded-xl border bg-card p-4 flex flex-col gap-2">
+            <div className="text-sm font-semibold">Almacenamiento</div>
+            <p className="text-xs text-muted-foreground">
+              SSDs NVMe y discos duros al mejor precio por gigabyte.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {topDeals.length > 0 && (
+        <section className="mb-10">
+          <h2 className="text-2xl font-semibold mb-3">Mejores ofertas</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Productos con bajadas de precio significativas respecto a su historial.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {topDeals.map((deal) => (
+              <ProductCard
+                key={`deal-${deal.id}`}
+                name={deal.name}
+                price={deal.price}
+                store={deal.store}
+                url={deal.url ?? "#"}
+                slug={deal.slug}
+                isHistoricalLow={deal.isHistoricalLow}
+                discountPercentage={deal.discountPercentage}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section>
+        <h2 className="text-2xl font-semibold mb-3">Últimos productos añadidos</h2>
+        <p className="text-sm text-muted-foreground mb-4">
+          Una selección rápida de componentes recién añadidos a Comparer.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {latestProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              name={product.name}
+              price={product.price}
+              store={product.store}
+              url={product.url ?? "#"}
+              slug={product.slug}
+            />
+          ))}
+        </div>
+      </section>
+    </main>
   );
 }

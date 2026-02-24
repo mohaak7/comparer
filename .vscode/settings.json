@@ -1,0 +1,7 @@
+{
+    "workbench.externalUriOpeners": {
+        "http://localhost:*": "simpleBrowser.show"
+    },
+    "terminal.integrated.linkHandling": "always",
+    "simpleBrowser.url": "http://localhost:3000"
+}
