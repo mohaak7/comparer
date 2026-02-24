@@ -52,22 +52,26 @@ async function syncPrices() {
     let unchanged = 0;
     let failed = 0;
 
-    for (const entry of latestEntries) {
+    const queue = [...latestEntries];
+
+    for (let index = 0; index < queue.length; index++) {
+        const entry = queue[index];
         if (!entry.url) {
             console.log(`⏭️  Skipping product #${entry.productId} (${entry.store}) — no URL`);
             continue;
         }
 
-            console.log(`\n🔍 Product #${entry.productId} — ${entry.store}:`);
+        console.log(`\n🔍 [${index + 1}/${queue.length}] Product #${entry.productId} — ${entry.store}:`);
 
         try {
             const isAliExpress = entry.store.toLowerCase() === "aliexpress";
+            const oldPrice = entry.price;
             const newPrice = isAliExpress
                 ? await getAliExpressPrice(entry.url)
                 : await getLatestPrice(entry.url, entry.store);
 
             if (newPrice !== null) {
-                if (newPrice !== entry.price) {
+                if (newPrice !== oldPrice) {
                     // INSERT a new record to preserve price history
                     await db.insert(prices).values({
                         productId: entry.productId,
@@ -118,10 +122,14 @@ async function syncPrices() {
                         );
                     }
 
-                    const diff = newPrice - entry.price;
+                    const diff = newPrice - oldPrice;
                     const arrow = diff > 0 ? "📈" : "📉";
+                    const pctChange =
+                        oldPrice > 0 ? ((newPrice - oldPrice) / oldPrice) * 100 : 0;
                     console.log(
-                        `  ${arrow} New price recorded: ${entry.price}€ → ${newPrice}€ (${diff >= 0 ? "+" : ""}${diff.toFixed(2)}€)`
+                        `  ${arrow} New price recorded: ${oldPrice}€ → ${newPrice}€ (${diff >= 0 ? "+" : ""}${diff.toFixed(
+                            2
+                        )}€, ${pctChange >= 0 ? "+" : ""}${pctChange.toFixed(2)}%)`
                     );
                     inserted++;
                 } else {

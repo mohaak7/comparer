@@ -1,5 +1,6 @@
 import { ProductCard } from "@/components/product/ProductCard";
 import { getProductsWithPrices, getTopDeals } from "@/lib/db-queries";
+import { Cpu, HardDrive, Monitor } from "lucide-react";
 
 export const revalidate = 3600; // ISR: refresh data every hour
 
@@ -43,22 +44,31 @@ export default async function Home() {
 
       {/* Categories grid */}
       <section className="mb-10 md:mb-12">
-        <h2 className="text-xl md:text-2xl font-semibold mb-4">Categorías populares</h2>
+        <h2 className="text-xl md:text-2xl font-semibold mb-4">Categorías destacadas</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
           <div className="rounded-xl border bg-card p-4 flex flex-col gap-2">
-            <div className="text-sm font-semibold">Tarjetas gráficas</div>
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <Monitor className="w-4 h-4 text-primary" />
+              Tarjetas gráficas
+            </div>
             <p className="text-xs text-muted-foreground">
               Encuentra la mejor GPU para gaming y creación de contenido.
             </p>
           </div>
           <div className="rounded-xl border bg-card p-4 flex flex-col gap-2">
-            <div className="text-sm font-semibold">Procesadores</div>
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <Cpu className="w-4 h-4 text-primary" />
+              Procesadores
+            </div>
             <p className="text-xs text-muted-foreground">
               Compara CPUs de última generación para tu próximo PC.
             </p>
           </div>
           <div className="rounded-xl border bg-card p-4 flex flex-col gap-2">
-            <div className="text-sm font-semibold">Almacenamiento</div>
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <HardDrive className="w-4 h-4 text-primary" />
+              Almacenamiento
+            </div>
             <p className="text-xs text-muted-foreground">
               SSDs NVMe y discos duros al mejor precio por gigabyte.
             </p>
@@ -68,9 +78,9 @@ export default async function Home() {
 
       {topDeals.length > 0 && (
         <section className="mb-10">
-          <h2 className="text-2xl font-semibold mb-3">Mejores ofertas</h2>
+          <h2 className="text-2xl font-semibold mb-3">Bajadas de precio</h2>
           <p className="text-sm text-muted-foreground mb-4">
-            Productos con bajadas de precio significativas respecto a su historial.
+            Productos con descuentos destacados respecto a su precio medio histórico.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {topDeals.map((deal) => (

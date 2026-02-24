@@ -25,12 +25,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
 
     const cheapest = product.prices[0];
+    const stores = product.prices.map((p) => p.store).join(", ");
+    const title = `Comprar ${product.name} al mejor precio - Comparer`;
+    const description = `Comprar ${product.name} al mejor precio en ${stores}. Desde ${cheapest.price.toFixed(
+        2
+    )}€. Ofertas actualizadas en ${currentYear}.`;
+
     return {
-        title: `${product.name} al mejor precio | Comparativa ${currentYear}`,
-        description: `Compara precios de ${product.name} en ${product.prices.map((p) => p.store).join(", ")}. Desde ${cheapest.price.toFixed(2)}€. Ofertas actualizadas en ${currentYear}.`,
+        title,
+        description,
         openGraph: {
-            title: `${product.name} al mejor precio | Comparativa ${currentYear}`,
-            description: `Mejor precio: ${cheapest.price.toFixed(2)}€ en ${cheapest.store}. Compara ofertas de ${product.prices.length} tiendas.`,
+            title,
+            description: `Mejor precio: ${cheapest.price.toFixed(
+                2
+            )}€ en ${cheapest.store}. Compara ofertas de ${product.prices.length} tiendas con Comparer.`,
         },
     };
 }

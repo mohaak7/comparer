@@ -19,6 +19,26 @@ export type DealProduct = ProductWithPrice & {
     isHistoricalLow: boolean;
 };
 
+export async function searchProducts(query: string): Promise<ProductWithPrice[]> {
+    const term = query.trim();
+    if (!term) return [];
+
+    const all = await getProductsWithPrices();
+    const lowered = term.toLowerCase();
+
+    return all.filter((p) => {
+        const name = p.name.toLowerCase();
+        const category = (p.category ?? "").toLowerCase();
+        const brand = (p.brand ?? "").toLowerCase();
+
+        return (
+            name.includes(lowered) ||
+            category.includes(lowered) ||
+            brand.includes(lowered)
+        );
+    });
+}
+
 /**
  * Fetch every product together with its cheapest current price.
  * Returns one row per product (the store with the lowest price wins).
